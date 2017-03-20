@@ -30,7 +30,7 @@ COPY_ORIGINAL = config.getboolean('File Manipulation', 'copy-original')
 SAVE_ALWAYS = config.getboolean('File Manipulation', 'save-always')
 SAVE_FORENSICS = config.getboolean('File Manipulation', 'save-forensics')
 NICE_LEVEL = config.get('Helper Apps', 'nice-level')
-DO_PROCESSING = config.get('Processing', 'do-processing')
+PROCESSING = config.get('Processing', 'do-processing')
 NEW_FORMAT = config.get('Processing', 'new-format')
 
 # Logging.
@@ -56,7 +56,7 @@ def sizeof_fmt(num, suffix='B'):
   return "%.1f%s%s" % (num, 'Y', suffix)
 
 if len(sys.argv) < 2:
-  print 'Usage: PlexComDelete.py input-file.ts'
+  print 'Usage: PlexComskip.py input-file.mkv'
   sys.exit(1)
 
 # Clean up after ourselves and exit.
@@ -109,7 +109,6 @@ try:
   original_video_dir = os.path.dirname(video_path)
   video_basename = os.path.basename(video_path)
   video_name, video_ext = os.path.splitext(video_basename)
-  NEW_VIDEO_NAME = video_name + '.' + NEW_FORMAT
 
 except Exception, e:
   logging.error('Something went wrong setting up temp paths and working files: %s' % e)
@@ -209,22 +208,10 @@ try:
     logging.info('Output file size was too similar (doesn\'t look like we did much); we won\'t replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
     cleanup_and_exit(temp_dir, SAVE_ALWAYS)
   elif input_size and 1.1 > float(output_size) / float(input_size) > 0.5:
-    logging.info('Output file size looked sane: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
-    if DO_PROCESSING and video_ext != NEW_FORMAT:
-      logging.info('Output file size looked sane, and we are set to transcode to new file format: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
-      logging.info('Copying the output file into place: %s -> %s' % (video_basename, original_video_dir))
-      cmd = NICE_ARGS + [FFMPEG_PATH, '-i', temp_video_path, '-acodec', 'copy', '-vcodec', 'copy', NEW_VIDEO_NAME]
-      logging.info('[ffmpeg] Command: %s' % cmd)
-      try:
-        subprocess.call(cmd)
-      except Exception, e:
-        logging.error('Exception running ffmpeg: %s' % e)
-        cleanup_and_exit(temp_dir, SAVE_ALWAYS or SAVE_FORENSICS)
-    else:
-       logging.info('Output file size looked sane, we\'ll replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
-       logging.info('Copying the output file into place: %s -> %s' % (video_basename, original_video_dir))
-       shutil.copy(os.path.join(temp_dir, video_basename), original_video_dir)
-       cleanup_and_exit(temp_dir, SAVE_ALWAYS)
+    logging.info('Output file size looked sane, we\'ll replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
+    logging.info('Copying the output file into place: %s -> %s' % (video_basename, original_video_dir))
+    shutil.copy(os.path.join(temp_dir, video_basename), original_video_dir)
+    cleanup_and_exit(temp_dir, SAVE_ALWAYS)
   else:
     logging.info('Output file size looked wonky (too big or too small); we won\'t replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
     cleanup_and_exit(temp_dir, SAVE_ALWAYS or SAVE_FORENSICS)
