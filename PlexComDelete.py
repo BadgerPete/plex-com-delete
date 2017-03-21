@@ -213,7 +213,7 @@ try:
     if DO_PROCESSING and video_ext != NEW_FORMAT:
       logging.info('Output file size looked sane, and we are set to transcode to new file format: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
       logging.info('Copying the output file into place: %s -> %s' % (video_basename, original_video_dir))
-      cmd = NICE_ARGS + [FFMPEG_PATH, '-i', temp_video_path, '-acodec', 'copy', '-vcodec', 'copy', NEW_VIDEO_NAME]
+      cmd = NICE_ARGS + [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-acodec', 'copy', '-vcodec', 'copy', os.path.join(original_video_dir, NEW_VIDEO_NAME)]
       logging.info('[ffmpeg] Command: %s' % cmd)
       try:
         subprocess.call(cmd)
