@@ -11,7 +11,7 @@ import time
 import uuid
 
 # Config stuff.
-config_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'PlexComskip.conf')
+config_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'PlexComDelete.conf')
 if not os.path.exists(config_file_path):
   print 'Config file not found: %s' % config_file_path
   print 'Make a copy of PlexComDelete.conf.example named PlexComDelete.conf, modify as necessary, and place in the same directory as this script.'
@@ -124,7 +124,7 @@ try:
     temp_video_path = video_path
 
   # Process with comskip.
-  cmd = NICE_ARGS + [COMSKIP_PATH, '--output', temp_dir, '--ini', COMSKIP_INI_PATH, temp_video_path]
+  cmd = NICE_ARGS + [COMSKIP_PATH, '--output', original_video_dir, '--ini', COMSKIP_INI_PATH, temp_video_path]
   logging.info('[comskip] Command: %s' % cmd)
   subprocess.call(cmd)
 
@@ -132,7 +132,7 @@ except Exception, e:
   logging.error('Something went wrong during comskip analysis: %s' % e)
   cleanup_and_exit(temp_dir, SAVE_ALWAYS or SAVE_FORENSICS)
 
-edl_file = os.path.join(temp_dir, video_name + '.edl')
+edl_file = os.path.join(original_video_dir, video_name + '.edl')
 logging.info('Using EDL: ' + edl_file)
 try:
   segments = []
